@@ -1,6 +1,6 @@
 import { IHeuristic } from "./Heuristic";
-import { IHillClimbingState } from "./IHillClimbingState";
-import { IIterativeSearch } from "./IIterativeSearch";
+import { IHillClimbingState } from "../Interfaces/IHillClimbingState";
+import { IIterativeSearch } from "../Interfaces/IIterativeSearch";
 
 export class HillClimbing implements IIterativeSearch {
     state: IHillClimbingState;

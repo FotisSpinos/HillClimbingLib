@@ -1,7 +1,7 @@
 import { IHeuristic } from "./Heuristic";
 import { HillClimbing } from "./HillClimbing";
-import { IHillClimbingState } from "./IHillClimbingState";
-import { IIterativeSearch } from "./IIterativeSearch";
+import { IHillClimbingState } from "../Interfaces/IHillClimbingState";
+import { IIterativeSearch } from "../Interfaces/IIterativeSearch";
 
 class RandomStartHillClimbing implements IIterativeSearch {
     
