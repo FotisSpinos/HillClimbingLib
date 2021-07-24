@@ -5,29 +5,21 @@ import { IIterativeSearch } from "../Interfaces/IIterativeSearch";
 export class HillClimbing <T extends BaseHillClimbingState> {
     state: T;
     heuristic: BaseHeuristic;
-    completed: boolean;
-    highestEvaluation: number;
+    isCompleted: boolean;
 
     constructor(state: T, heuristic: BaseHeuristic) {
         this.state = state;
         this.heuristic = heuristic;
-        this.completed = false;
-
-        this.highestEvaluation = this.heuristic.evaluate(this.state);
+        this.isCompleted = false;
     }
 
     iterateOnce() : T {
         let currentState = this.state;
         let nextState = null;
-
-        // TODO: Check if we need that, it looks like it never runs! 
-        if (nextState != null)
-            currentState = nextState;
-
-
         let neighbors = currentState.expand(this.state)
 
-        let max = this.heuristic.evaluate(currentState);
+        let startStateEvaluation = this.heuristic.evaluate(currentState);
+        let max = startStateEvaluation;
 
         for (let i = 0; i < neighbors.length; i++) {
             let evaluation = this.heuristic.evaluate(neighbors[i])
@@ -38,22 +30,19 @@ export class HillClimbing <T extends BaseHillClimbingState> {
             }
         }
         
-        console.log(`max ${max} heuristic ${this.heuristic.evaluate(currentState)}`)
-        console.log(`difference: ${max - this.heuristic.evaluate(currentState)}`);
-
-        if (max > this.highestEvaluation) {
-            console.log(`This runs`);
-            this.highestEvaluation = max;
-            this.state = nextState;
+        console.log(`max evaluation ${max} start evaluation ${startStateEvaluation}`)
+        
+        if (nextState == null) {
+            this.isCompleted = true;
         }
-        else {
-            this.completed = true;
+        else{
+            this.state = nextState;
         }
 
         return this.state;
     }
 
-    completeSearch(): BaseHillClimbingState {
+    completeSearch(): T {
  
         //! This looks unecessary, we can just run iterate once until this.complete == true
  
@@ -81,7 +70,7 @@ export class HillClimbing <T extends BaseHillClimbingState> {
             iterations++;
         } while (this.heuristic.evaluate(currentState) <= this.heuristic.evaluate(nextState) && iterations < 100)
 
-        this.completed = true;
+        this.isCompleted = true;
 
         if (iterations == 100) {
             console.log(`The search was not completed successfully`);
