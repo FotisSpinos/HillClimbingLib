@@ -35,7 +35,7 @@ export class HillClimbing <T extends BaseHillClimbingState> {
         if (nextState == null) {
             this.isCompleted = true;
         }
-        else{
+        else {
             this.state = nextState;
         }
 
@@ -44,38 +44,10 @@ export class HillClimbing <T extends BaseHillClimbingState> {
 
     completeSearch(): T {
  
-        //! This looks unecessary, we can just run iterate once until this.complete == true
- 
-        let currentState = this.state;
-        let nextState = null;
-        let iterations = 0
-
-        do {
-
-            if (nextState != null)
-                currentState = nextState;
-
-            let neighbors = currentState.expand(currentState)
-
-            let max = Number.NEGATIVE_INFINITY;
-
-            for (let i = 0; i < neighbors.length; i++) {
-                let evaluation = this.heuristic.evaluate(neighbors[i])
-
-                if (evaluation > max) {
-                    max = evaluation
-                    nextState = neighbors[i]
-                }
-            }
-            iterations++;
-        } while (this.heuristic.evaluate(currentState) <= this.heuristic.evaluate(nextState) && iterations < 100)
-
-        this.isCompleted = true;
-
-        if (iterations == 100) {
-            console.log(`The search was not completed successfully`);
+        while(!this.isCompleted){
+            this.iterateOnce();
         }
 
-        return currentState;
+        return this.state;
     }
 }
