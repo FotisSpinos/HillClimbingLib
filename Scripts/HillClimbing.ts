@@ -2,7 +2,7 @@ import { BaseHeuristic } from "../Abstract/BaseHeuristic";
 import { BaseHillClimbingState } from "../Abstract/BaseHillClimbingState";
 import { IIterativeSearch } from "../Interfaces/IIterativeSearch";
 
-export class HillClimbing <T extends BaseHillClimbingState> {
+export class HillClimbing <T extends BaseHillClimbingState> implements IIterativeSearch<T>{
     state: T;
     heuristic: BaseHeuristic;
     isCompleted: boolean;
@@ -16,10 +16,12 @@ export class HillClimbing <T extends BaseHillClimbingState> {
     iterateOnce() : T {
         let currentState = this.state;
         let nextState = null;
-        let neighbors = currentState.expand(this.state)
 
         let startStateEvaluation = this.heuristic.evaluate(currentState);
         let max = startStateEvaluation;
+        
+        // Get neighbor states
+        let neighbors = currentState.expand(this.state)
 
         for (let i = 0; i < neighbors.length; i++) {
             let evaluation = this.heuristic.evaluate(neighbors[i])
@@ -29,9 +31,8 @@ export class HillClimbing <T extends BaseHillClimbingState> {
                 nextState = neighbors[i]
             }
         }
-        
-        console.log(`max evaluation ${max} start evaluation ${startStateEvaluation}`)
-        
+
+        // store next state or complete search
         if (nextState == null) {
             this.isCompleted = true;
         }
@@ -43,11 +44,10 @@ export class HillClimbing <T extends BaseHillClimbingState> {
     }
 
     completeSearch(): T {
- 
         while(!this.isCompleted){
             this.iterateOnce();
         }
-
+        
         return this.state;
     }
 }
