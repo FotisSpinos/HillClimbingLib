@@ -6,7 +6,7 @@ export class HillClimbing <T extends BaseHillClimbingState> implements IIterativ
     state: T;
     heuristic: BaseHeuristic;
     isCompleted: boolean;
-
+ 
     constructor(state: T, heuristic: BaseHeuristic) {
         this.state = state;
         this.heuristic = heuristic;
