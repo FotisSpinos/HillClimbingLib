@@ -23,6 +23,7 @@ export class FirstChoiceHillClimbing <T extends BaseHillClimbingState> implement
 
         do{
             if(remainingIterations <= 0){
+                this.isCompleted = true
                 return this.state
             }
             remainingIterations--
