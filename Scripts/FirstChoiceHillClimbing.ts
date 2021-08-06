@@ -1,13 +1,12 @@
-import { BaseHeuristic } from "../Abstract/BaseHeuristic";
-import { BaseHillClimbingState } from "../Abstract/BaseHillClimbingState";
-import { IIterativeSearch } from "../Interfaces/IIterativeSearch";
+import { BaseHeuristic } from "../Abstract/BaseHeuristic.js";
+import { BaseHillClimbingState } from "../Abstract/BaseHillClimbingState.js";
+import { BaseHillClimbingSearch } from "../Abstract/BaseHillClimbingSearch.js";
 
-export class FirstChoiceHillClimbing <T extends BaseHillClimbingState> implements IIterativeSearch<T>{
-    state: T;
-    heuristic: BaseHeuristic;
-    isCompleted: boolean;
- 
+export class FirstChoiceHillClimbing <T extends BaseHillClimbingState> extends BaseHillClimbingSearch<T>{
+    
     constructor(state: T, heuristic: BaseHeuristic) {
+        super();
+
         this.state = state;
         this.heuristic = heuristic;
         this.isCompleted = false;
@@ -36,14 +35,6 @@ export class FirstChoiceHillClimbing <T extends BaseHillClimbingState> implement
 
         this.state = randomNeighbor
 
-        return this.state;
-    }
-
-    completeSearch(): T {
-        while(!this.isCompleted){
-            this.iterateOnce();
-        }
-        
         return this.state;
     }
 

@@ -1,6 +1,10 @@
-import { BaseHillClimbingState } from "../Abstract/BaseHillClimbingState";
-
-export interface IIterativeSearch<T extends BaseHillClimbingState> {
+export interface IIteractiveSearch<T> {
+    
     iterateOnce(): T
+    
     completeSearch(): T
+    
+    get IsCompleted() : boolean
+
+    get State() : T
 }

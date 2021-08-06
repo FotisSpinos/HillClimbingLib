@@ -1,12 +1,9 @@
-import { BaseHeuristic } from "../Abstract/BaseHeuristic";
-import { BaseHillClimbingState } from "../Abstract/BaseHillClimbingState";
-import { IIterativeSearch } from "../Interfaces/IIterativeSearch";
+import { BaseHeuristic } from "../Abstract/BaseHeuristic.js";
+import { BaseHillClimbingState } from "../Abstract/BaseHillClimbingState.js";
+import { BaseHillClimbingSearch } from "../Abstract/BaseHillClimbingSearch.js";
 import { HillClimbing } from "./HillClimbing.js";
 
-export class RandomRestartHillClimbing <T extends BaseHillClimbingState> implements IIterativeSearch<T>{
-    state: T;
-    heuristic: BaseHeuristic;
-    isCompleted: boolean;
+export class RandomRestartHillClimbing <T extends BaseHillClimbingState> extends BaseHillClimbingSearch<T> {
     bestState: T = null;
 
     private remainingRestarts: number
@@ -14,13 +11,15 @@ export class RandomRestartHillClimbing <T extends BaseHillClimbingState> impleme
     private createRandomState: () => T
 
     constructor(state: T, heuristic: BaseHeuristic, restarts: number, createRandomState: () => T ) {
+        super();
+
         this.hillClimbing = new HillClimbing(state, heuristic)
         this.remainingRestarts = restarts
         this.createRandomState = createRandomState
     }
 
     iterateOnce() : T {
-        if(this.hillClimbing.isCompleted && this.remainingRestarts >= 0) {
+        if(this.hillClimbing.IsCompleted && this.remainingRestarts >= 0) {
 
             // restart search
             this.hillClimbing = new HillClimbing(this.createRandomState(), this.hillClimbing.heuristic);
@@ -39,17 +38,9 @@ export class RandomRestartHillClimbing <T extends BaseHillClimbingState> impleme
 
         // if there are no remaining restarts and the current hill climbing search is completed
         // switch the state to completed
-        if(this.remainingRestarts == 0 && this.hillClimbing.isCompleted)
+        if(this.remainingRestarts == 0 && this.hillClimbing.IsCompleted)
             this.isCompleted = true
 
         return state
-    }
-
-    completeSearch(): T {
-        while(!this.isCompleted){
-            this.iterateOnce();
-        }
-        
-        return this.state;
     }
 }

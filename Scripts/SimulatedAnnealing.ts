@@ -1,18 +1,18 @@
-import { BaseHeuristic } from "../Abstract/BaseHeuristic";
-import { BaseHillClimbingState } from "../Abstract/BaseHillClimbingState";
-import { IIterativeSearch } from "../Interfaces/IIterativeSearch";
+import { BaseHeuristic } from "../Abstract/BaseHeuristic.js";
+import { BaseHillClimbingState } from "../Abstract/BaseHillClimbingState.js";
+import { BaseHillClimbingSearch } from "../Abstract/BaseHillClimbingSearch.js";
 
-export class SimulatedAnnealing <T extends BaseHillClimbingState> implements IIterativeSearch<T>{
-    public state: T;
-    public heuristic: BaseHeuristic;
-    public isCompleted: boolean;
+export class SimulatedAnnealing <T extends BaseHillClimbingState> extends BaseHillClimbingSearch<T>{
+    
     public minTemperature: number;
     
     private temperature: number = 0;
     private iterationCount: number = 0;
     private initTemperature: number = 0;
 
-    constructor(state: T, heuristic: BaseHeuristic, temperature: number, minTemperature: number){
+    constructor(state: T, heuristic: BaseHeuristic, temperature: number, minTemperature: number) {
+        super();
+
         this.state = state;
         this.heuristic = heuristic;
         this.isCompleted = false;
@@ -75,12 +75,5 @@ export class SimulatedAnnealing <T extends BaseHillClimbingState> implements IIt
         let randomNeighbor = neighbors[randomIndex]
         
         return randomNeighbor as T;
-    }
-    
-    completeSearch(): T {
-        while(!this.isCompleted){
-            this.iterateOnce();
-        }
-        return this.state;
     }
 }
