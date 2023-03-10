@@ -7,7 +7,7 @@
     "target": "es6",                                /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
     "allowJs": true,                                /* Allow javascript files to be compiled. */
     "declaration": false,                           /* Generates corresponding '.d.ts' file. */
-    "outDir": "./outDir",                      /* Redirect output structure to the directory. */
+    "outDir": "./output",                      /* Redirect output structure to the directory. */
     "rootDir": "./",                                /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     "composite": false,                             /* Enable project compilation */
     "alwaysStrict": true,                           /* Parse in strict mode and emit "use strict" for each source file. */
