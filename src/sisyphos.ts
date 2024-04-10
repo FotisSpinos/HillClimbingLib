@@ -26,16 +26,16 @@
 /**
  * Implemented by all hill climbing search classes.
  */
-export interface IIterativeSearch<T> {
+interface IterativeSearch<StateType> {
     /**
      * Conducts a single hill climbing search iteration.
      */
-    iterateOnce(): T;
+    iterateOnce(): StateType;
 
     /**
      * Completes the hill climbing search. Calls IterateOnce until the search is completed.
      */
-    completeSearch(): T;
+    completeSearch(): StateType;
 
     /**
      * Returns true if the hill climbing search is completed.
@@ -45,17 +45,17 @@ export interface IIterativeSearch<T> {
     /**
      * Returns the current state.
      */
-    getState(): T;
+    getState(): StateType;
 }
 
 /**
  * A base class providing helper functions and base functionality to all hill climbing search classes.
  */
-export abstract class BaseHillClimbingSearch<T extends BaseHillClimbingState>
-    implements IIterativeSearch<T> {
+abstract class HillClimbingSearch<StateType extends HillClimbingState<StateType>>
+    implements IterativeSearch<StateType> {
     protected constructor(
-        state: T,
-        heuristic: (state: BaseHillClimbingState) => number
+        state: StateType,
+        heuristic: (state: StateType) => number
     ) {
         if (!state) {
             throw new Error("State should be a valid instance");
@@ -73,18 +73,18 @@ export abstract class BaseHillClimbingSearch<T extends BaseHillClimbingState>
     /**
      * Conducts a single hill climbing search iteration.
      */
-    public abstract iterateOnce(): T;
+    public abstract iterateOnce(): StateType;
 
     /**
      * The heuristic providing the evaluation for a given state.
      */
-    public heuristic: (state: BaseHillClimbingState) => number;
+    public heuristic: (state: StateType) => number;
 
     /**
      * Calls iterateOnce until the search is completed.
      * @returns the current state.
      */
-    public completeSearch(): T {
+    public completeSearch(): StateType {
         while (!this.isCompleted) {
             this.iterateOnce();
         }
@@ -102,14 +102,14 @@ export abstract class BaseHillClimbingSearch<T extends BaseHillClimbingState>
     /**
      * Returns the current state.
      */
-    public getState(): T {
+    public getState(): StateType {
         return this.state;
     }
 
     /**
      * The current state.
      */
-    protected state: T;
+    protected state: StateType;
 
     /**
      * Set to true when the search is completed.
@@ -119,16 +119,16 @@ export abstract class BaseHillClimbingSearch<T extends BaseHillClimbingState>
     /**
      * Generates the current state's neighboring states and returns a random one.
      */
-    protected getRandomNeighbor(): T {
+    protected getRandomNeighbor(): StateType {
         let neighbors = this.state.expand();
 
         let randomIndex = getRandomInt(neighbors.length);
         let randomNeighbor = neighbors[randomIndex];
 
-        return randomNeighbor as T;
+        return randomNeighbor
     }
 
-    public getBestExpandedState(): T {
+    public getBestExpandedState(): StateType {
         let nextState = null;
         let startStateEvaluation = this.heuristic(this.state);
         let max = startStateEvaluation;
@@ -142,37 +142,32 @@ export abstract class BaseHillClimbingSearch<T extends BaseHillClimbingState>
                 nextState = neighbors[i];
             }
         }
-        return nextState as T;
+        return nextState
     }
 }
 
 /**
- * A base class representing a state.
+ * An interface representing a state.
  */
-export abstract class BaseHillClimbingState {
+export interface HillClimbingState<StateType> {
     /**
      * Returns all neighboring states.
      */
-    abstract expand(): BaseHillClimbingState[];
+    expand(): StateType[];
 }
 
 /**
  * On each iteration the algorithm determines the next state by picking the current state's highest ranking neighbor.
  */
-export class HillClimbing<
-    T extends BaseHillClimbingState
-> extends BaseHillClimbingSearch<T> {
-    public constructor(
-        state: T,
-        heuristic: (state: BaseHillClimbingState) => number
-    ) {
+export class HillClimbing<StateType extends HillClimbingState<StateType>> extends HillClimbingSearch<StateType> {
+    public constructor(state: StateType, heuristic: (state: StateType) => number) {
         super(state, heuristic);
     }
 
     /**
      * Conducts a single hill climbing search iteration.
      */
-    public iterateOnce(): T {
+    public iterateOnce(): StateType {
         let nextState = this.getBestExpandedState();
 
         // store next state or complete search
@@ -190,17 +185,12 @@ export class HillClimbing<
  * On each iteration the first choice hill climbing search generates a new state until it's evaluation exceeds the current state.
  * The higher ranking state becomes the current state.
  */
-export class FirstChoiceHillClimbing<
-    T extends BaseHillClimbingState
-> extends BaseHillClimbingSearch<T> {
-    public constructor(
-        state: T,
-        heuristic: (state: BaseHillClimbingState) => number
-    ) {
+export class FirstChoiceHillClimbing<StateType extends HillClimbingState<StateType>> extends HillClimbingSearch<StateType> {
+    public constructor(state: StateType, heuristic: (state: StateType) => number) {
         super(state, heuristic);
     }
 
-    public iterateOnce(): T {
+    public iterateOnce(): StateType {
         let startStateEvaluation = this.heuristic(this.state);
 
         let randomNeighborEvaluation = Number.NEGATIVE_INFINITY;
@@ -225,7 +215,7 @@ export class FirstChoiceHillClimbing<
             randomNeighborEvaluation = this.heuristic(randomNeighbor);
         } while (randomNeighborEvaluation < startStateEvaluation);
 
-        this.state = randomNeighbor as T;
+        this.state = randomNeighbor
 
         return this.state;
     }
@@ -234,19 +224,17 @@ export class FirstChoiceHillClimbing<
 /**
  * Restarts the hill climbing search with a randomly generated state until the number of restarts is reached.
  */
-export class RandomRestartHillClimbing<
-    T extends BaseHillClimbingState
-> extends BaseHillClimbingSearch<T> {
-    private bestState: T = null;
+export class RandomRestartHillClimbing<StateType extends HillClimbingState<StateType>> extends HillClimbingSearch<StateType> {
+    private bestState: StateType = null;
     private remainingRestarts: number;
-    private hillClimbing: HillClimbing<T>;
-    private createRandomState: () => T;
+    private hillClimbing: HillClimbing<StateType>;
+    private createRandomState: () => StateType;
 
     public constructor(
-        state: T,
-        heuristic: (state: BaseHillClimbingState) => number,
+        state: StateType,
+        heuristic: (state: StateType) => number,
         restarts: number,
-        createRandomState: () => T
+        createRandomState: () => StateType
     ) {
         super(state, heuristic);
 
@@ -255,7 +243,7 @@ export class RandomRestartHillClimbing<
         this.createRandomState = createRandomState;
     }
 
-    public iterateOnce(): T {
+    public iterateOnce(): StateType {
         if (this.hillClimbing.getIsCompleted() && this.remainingRestarts >= 0) {
             // restart search
             this.hillClimbing = new HillClimbing(
@@ -289,7 +277,7 @@ export class RandomRestartHillClimbing<
         return this.remainingRestarts;
     }
 
-    public getBestState(): T {
+    public getBestState(): StateType {
         return this.bestState;
     }
 }
@@ -302,9 +290,7 @@ export class RandomRestartHillClimbing<
  * - The temperature is reduced on each iteration which makes the algorithm less likely to consider states with lower evaluations after the first iterations.
  * - The difference in evaluation between the current and generated states also determine the likeliness of considering the generated state.
  */
-export class SimulatedAnnealing<
-    T extends BaseHillClimbingState
-> extends BaseHillClimbingSearch<T> {
+export class SimulatedAnnealing<StateType extends HillClimbingState<StateType>> extends HillClimbingSearch<StateType> {
     public minTemperature: number;
 
     private temperature: number = 0;
@@ -312,8 +298,8 @@ export class SimulatedAnnealing<
     private initTemperature: number = 0;
 
     public constructor(
-        state: T,
-        heuristic: (state: BaseHillClimbingState) => number,
+        state: StateType,
+        heuristic: (state: StateType) => number,
         temperature: number,
         minTemperature: number
     ) {
@@ -324,7 +310,7 @@ export class SimulatedAnnealing<
         this.minTemperature = minTemperature;
     }
 
-    public iterateOnce(): T {
+    public iterateOnce(): StateType {
         // cannot iterate if temperature has fallen to 0
         if (this.temperature <= this.minTemperature) {
             this.isCompleted = true;
@@ -347,14 +333,14 @@ export class SimulatedAnnealing<
 
         // use neighbor's state if it ranks better than the current one
         if (de > 0) {
-            this.state = randomNeighbor as T;
+            this.state = randomNeighbor
         } else {
             // calculate the probability of navigating to a worse state
             let probability = Math.pow(Math.E, de / this.temperature);
 
             // set state if probability is met
             if (isProbabilityMet(probability)) {
-                this.state = randomNeighbor as T;
+                this.state = randomNeighbor
             }
         }
 
