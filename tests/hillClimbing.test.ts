@@ -1,4 +1,4 @@
-import { FirstChoiceHillClimbing, HillClimbing, RandomRestartHillClimbing } from "../src/sisyphos";
+import { HillClimbing, RandomRestartHillClimbing } from "../src/sisyphos";
 
 describe("HillClimbing", () => {
     const points = [1, 2, 5, 6, 1]

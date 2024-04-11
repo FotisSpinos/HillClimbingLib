@@ -29,21 +29,23 @@
 interface IterativeSearch<StateType> {
     /**
      * Conducts a single hill climbing search iteration.
+     * @returns The current state.
      */
     iterateOnce(): StateType
 
     /**
      * Completes the hill climbing search. Calls IterateOnce until the search is completed.
+     * @returns The current state.
      */
     completeSearch(): StateType
 
     /**
-     * Returns true if the hill climbing search is completed.
+     * @returns True if the hill climbing search is completed.
      */
     getIsCompleted(): boolean
 
     /**
-     * Returns the current state.
+     * @returns The current state.
      */
     getState(): StateType
 }
@@ -90,14 +92,14 @@ abstract class HillClimbingSearch<StateType> implements IterativeSearch<StateTyp
     }
 
     /**
-     * Returns true if the hill climbing search is completed.
+     * @returns True if the hill climbing search is completed.
      */
     public getIsCompleted(): boolean {
         return this.isCompleted
     }
 
     /**
-     * Returns the current state.
+     * @returns The current state.
      */
     public getState(): StateType {
         return this.state
@@ -125,7 +127,8 @@ export class HillClimbing<StateType> extends HillClimbingSearch<StateType> {
     }
 
     /**
-     *
+     * @returns The neighboring states that can be traversed from the given state.
+     * @param state The state to expand.
      */
     public expand: (state: StateType) => StateType[]
 
@@ -214,22 +217,31 @@ export class RandomRestartHillClimbing<StateType> extends HillClimbingSearch<Sta
     private bestState: StateType = null
     private remainingRestarts: number
     private hillClimbing: HillClimbing<StateType>
-    private createRandomState: () => StateType
+
+    /**
+     * @returns A random state.
+     */
+    private randomState: () => StateType
+
+    /**
+     * @returns The neighboring states that can be traversed from the given state.
+     * @param state The state to expand.
+     */
     protected expand: (state: StateType) => StateType[]
 
-    public constructor(state: StateType, expand: (state: StateType) => StateType[], heuristic: (state: StateType) => number, restarts: number, createRandomState: () => StateType) {
+    public constructor(state: StateType, expand: (state: StateType) => StateType[], heuristic: (state: StateType) => number, restarts: number, randomState: () => StateType) {
         super(state, heuristic)
 
         this.hillClimbing = new HillClimbing(state, expand, heuristic)
         this.remainingRestarts = restarts
-        this.createRandomState = createRandomState
+        this.randomState = randomState
         this.expand = expand
     }
 
     public iterateOnce(): StateType {
         if (this.hillClimbing.getIsCompleted() && this.remainingRestarts >= 0) {
             // restart search
-            this.hillClimbing = new HillClimbing(this.createRandomState(), this.expand, this.hillClimbing.heuristic)
+            this.hillClimbing = new HillClimbing(this.randomState(), this.expand, this.hillClimbing.heuristic)
             this.remainingRestarts--
 
             // record best state
@@ -272,10 +284,14 @@ export class RandomRestartHillClimbing<StateType> extends HillClimbingSearch<Sta
  */
 export class SimulatedAnnealing<StateType> extends HillClimbingSearch<StateType> {
     public minTemperature: number
+    private temperature: number
+    private iterationCount: number
+    private initTemperature: number
 
-    private temperature: number = 0
-    private iterationCount: number = 0
-    private initTemperature: number = 0
+    /**
+     * @returns The neighboring states that can be traversed from the given state.
+     * @param state The state to expand.
+     */
     protected expand: (state: StateType) => StateType[]
 
     public constructor(state: StateType, expand: (state: StateType) => StateType[], heuristic: (state: StateType) => number, temperature: number, minTemperature: number) {
